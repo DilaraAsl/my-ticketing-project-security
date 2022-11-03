@@ -82,6 +82,7 @@ public class UserController {
     public String deleteUser(@PathVariable("username") String username) {
         userService.deleteByUserName(username);
         return "redirect:/user/create";
+
     }
 
 }
