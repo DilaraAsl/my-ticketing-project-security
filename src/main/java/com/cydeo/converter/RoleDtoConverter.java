@@ -24,7 +24,9 @@ public class RoleDtoConverter implements Converter<String, RoleDTO> {
             return null;
         }
 
-        return roleService.findById(Long.parseLong(source));
+        return roleService.findById(Long.parseLong(source)); // this is how we find the RoleDTO obj
+        // property or field description cannot be found on null
+        // findById method which is in RoleServiceImpl returns null because it is not described yet
 
     }
 
