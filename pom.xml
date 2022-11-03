@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.cydeo</groupId>
-    <artifactId>my-ticketing-project-data-new</artifactId>
+    <artifactId>ticketing-project-data</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>my-ticketing-project-data-new</name>
-    <description>my-ticketing-project-data-new</description>
+    <name>ticketing-project-data</name>
+    <description>ticketing-project-data</description>
     <properties>
         <java.version>11</java.version>
     </properties>
@@ -29,7 +29,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -51,6 +54,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
