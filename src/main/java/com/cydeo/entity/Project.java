@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Where(clause="is_deleted=false")
 public class Project extends BaseEntity{
 
-    @Column(nullable = false,updatable = false)
+   // @Column(nullable = false,updatable = false)
     private String projectCode; // projectCode is unique to each project -should not be updated
 
     private String projectName;
