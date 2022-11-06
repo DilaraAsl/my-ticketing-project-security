@@ -39,6 +39,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void save(ProjectDTO dto) {
+        dto.setProjectStatus(Status.OPEN); // set the project status when saving the  project
+        // when converting from dto to entity manager id becomes null it should not be null
         projectRepository.save(projectMapper.convertToEntity(dto));// JpaRepository has a save method
 
     }
