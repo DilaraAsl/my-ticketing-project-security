@@ -1,0 +1,27 @@
+package com.cydeo.service;
+
+import com.cydeo.dto.ProjectDTO;
+import com.cydeo.dto.TaskDTO;
+import com.cydeo.enums.Status;
+
+import java.util.List;
+
+public interface TaskService {
+    List<TaskDTO> listAllTasks();
+    void save(TaskDTO taskDTO);
+    void update(TaskDTO taskDTO);
+    void delete(Long id);
+    TaskDTO findById(Long id);
+
+    //total no of uncompleted tasks under a project
+    int totalNonCompletedTask(String projectCode);
+    int totalCompletedTask(String projectCode);
+
+    void deleteByProject(ProjectDTO projectDTO);
+
+    void completeByProject(ProjectDTO projectDTO);
+
+    List<TaskDTO> listAllTasksByStatusIsNot(Status status);
+    List<TaskDTO> listAllTasksByStatus(Status status);
+
+}
