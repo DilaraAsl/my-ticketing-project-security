@@ -14,5 +14,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 @Query("select count(t) from Task t where t.project.projectCode=?1 and t.taskStatus='COMPLETE'")
     int totalCompletedTasks(String projectCode);
 
- List<Task> findAllByProject(Project project);
+ List<Task> findAllByProject(Project project); // we can pass entities directly in a derived query
+    // we cannot pass an entity directly to native or jpql query instead we can pass the projectId
 }

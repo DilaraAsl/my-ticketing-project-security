@@ -6,6 +6,7 @@ import com.cydeo.enums.Status;
 import com.cydeo.mapper.ProjectMapper;
 import com.cydeo.repository.ProjectRepository;
 import com.cydeo.service.ProjectService;
+import com.cydeo.service.TaskService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,9 +20,12 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+    private final TaskService taskService;
+
+    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper, TaskService taskService) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
+        this.taskService = taskService;
     }
 
 
@@ -67,7 +71,15 @@ public class ProjectServiceImpl implements ProjectService {
     public void delete(String code) {
         Project project=projectRepository.findByProjectCode(code);
         project.setIsDeleted(true); // soft delete
+
+        // when my project is deleted save it in this new format -- projectCode and projectId are both unique
+        // we can use the same project code again for a new project
+        project.setProjectCode(project.getProjectCode()+"-"+project.getId());
         projectRepository.save(project);
+        // when we delete a project the tasks that are under that project should be deleted as well
+
+        taskService.deleteByProject(projectMapper.convertToDto(project));
+
 
     }
 
