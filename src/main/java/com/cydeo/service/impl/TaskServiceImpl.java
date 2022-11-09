@@ -50,7 +50,8 @@ public class TaskServiceImpl implements TaskService {
         Task updatedTask=taskMapper.convertToEntity(taskDTO);
 
         if(task.isPresent()) { //isPresent() method of Optional Interface
-            updatedTask.setTaskStatus(task.get().getTaskStatus()); // set the project status
+            updatedTask.setTaskStatus(taskDTO.getTaskStatus()==null?task.get().getTaskStatus():taskDTO.getTaskStatus()); // set the project status
+            //if taskDTO status is null get the status from the db else get taskDTO status
             updatedTask.setAssignedDate(task.get().getAssignedDate()); // set the assigned date -- so that we do not have these fields set to null
             taskRepository.save(updatedTask);
         }
@@ -91,7 +92,7 @@ public class TaskServiceImpl implements TaskService {
       // find the project
         Project project=projectMapper.convertToEntity(projectDTO);
         List<Task> tasks=taskRepository.findAllByProject(project);
-        tasks.forEach(task->delete(task.getId()));
+        tasks.forEach(task->delete(task.getId())); // delete the tasks one by one
 
     }
 
@@ -101,7 +102,10 @@ public class TaskServiceImpl implements TaskService {
         Project project=projectMapper.convertToEntity(projectDTO);
         List<Task> tasks=taskRepository.findAllByProject(project);
 
-        tasks.stream().map(taskMapper::convertToDto).forEach(taskDTO -> taskDTO.setTaskStatus(Status.COMPLETE));
+        tasks.stream().map(taskMapper::convertToDto).forEach(taskDTO -> {
+            taskDTO.setTaskStatus(Status.COMPLETE);
+            update(taskDTO);
+        });
 
 
 

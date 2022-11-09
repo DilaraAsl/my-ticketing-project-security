@@ -90,5 +90,9 @@ public class ProjectServiceImpl implements ProjectService {
         project.setProjectStatus(Status.COMPLETE);
         projectRepository.save(project);
 
+        // when we set the project status complete all
+        // the tasks under this project their status should be marked as complete
+
+        taskService.completeByProject(projectMapper.convertToDto(project));
     }
 }
