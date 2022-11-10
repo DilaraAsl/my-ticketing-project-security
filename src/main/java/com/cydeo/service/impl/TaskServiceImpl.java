@@ -44,20 +44,20 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void save(TaskDTO taskDTO) {
-        taskDTO.setTaskStatus(Status.OPEN); // first set the status to open
-        taskDTO.setAssignedDate(LocalDate.now()); // set the date
-        taskRepository.save(taskMapper.convertToEntity(taskDTO)); //save it to the db
+    public void save(TaskDTO dto) {
+       dto.setTaskStatus(Status.OPEN); // first set the status to open
+        dto.setAssignedDate(LocalDate.now()); // set the date
+        taskRepository.save(taskMapper.convertToEntity(dto)); //save it to the db
 
     }
 
     @Override
-    public void update(TaskDTO taskDTO) {
-        Optional<Task> task=taskRepository.findById(taskDTO.getId());
-        Task updatedTask=taskMapper.convertToEntity(taskDTO);
+    public void update(TaskDTO dto) {
+        Optional<Task> task=taskRepository.findById(dto.getId());
+        Task updatedTask=taskMapper.convertToEntity(dto);
 
         if(task.isPresent()) { //isPresent() method of Optional Interface
-            updatedTask.setTaskStatus(taskDTO.getTaskStatus()==null?task.get().getTaskStatus():taskDTO.getTaskStatus()); // set the project status
+            updatedTask.setTaskStatus(dto.getTaskStatus()==null?task.get().getTaskStatus():dto.getTaskStatus()); // set the project status
             //if taskDTO status is null get the status from the db else get taskDTO status
             updatedTask.setAssignedDate(task.get().getAssignedDate()); // set the assigned date -- so that we do not have these fields set to null
             taskRepository.save(updatedTask);
@@ -66,11 +66,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void delete(Long id) {
-        Optional<Task> task=taskRepository.findById(id);
+        Optional<Task> foundTask=taskRepository.findById(id);
 
-        if(task.isPresent()){
-            task.get().setIsDeleted(true); // soft delete the task
-            taskRepository.save(task.get()); // get() optional interface
+        if(foundTask.isPresent()){
+            foundTask.get().setIsDeleted(true); // soft delete the task
+            taskRepository.save(foundTask.get()); // get() optional interface
         }
 
     }
@@ -96,11 +96,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteByProject(ProjectDTO projectDTO) {
-      // find the project
-        Project project=projectMapper.convertToEntity(projectDTO);
-        List<Task> tasks=taskRepository.findAllByProject(project);
-        tasks.forEach(task->delete(task.getId())); // delete the tasks one by one
-
+        Project project = projectMapper.convertToEntity(projectDTO);
+        List<Task> tasks = taskRepository.findAllByProject(project);
+        tasks.forEach(task -> delete(task.getId()));
     }
 
     @Override
@@ -108,7 +106,6 @@ public class TaskServiceImpl implements TaskService {
         // mark all tasks as complete when a project is completed
         Project project=projectMapper.convertToEntity(projectDTO);
         List<Task> tasks=taskRepository.findAllByProject(project);
-
         tasks.stream().map(taskMapper::convertToDto).forEach(taskDTO -> {
             taskDTO.setTaskStatus(Status.COMPLETE);
             update(taskDTO);
@@ -119,9 +116,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskDTO> listAllTasksByStatusIsNot(Status status) {
-        UserDTO loggedInUser=userService.findByUserName("john@employee.com");
-        User user=userMapper.convertToEntity(loggedInUser);
-        List<Task> tasks=taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(status,user);
+        UserDTO loggedInUser = userService.findByUserName("john@employee.com");
+        List<Task> tasks = taskRepository.
+                findAllByTaskStatusIsNotAndAssignedEmployee(status, userMapper.convertToEntity(loggedInUser));
         return tasks.stream().map(taskMapper::convertToDto).collect(Collectors.toList());
     }
 
