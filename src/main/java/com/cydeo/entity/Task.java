@@ -15,21 +15,23 @@ import java.time.LocalDate;
 @Table(name="tasks")
 @Where(clause="is_deleted=false")// show the task in UI if is_deleted is false
 public class Task extends BaseEntity{
-    @Column(columnDefinition = "DATE")
-    LocalDate assignedDate;
 
-    String taskDetail;
+    private String taskSubject;
+    private String taskDetail;
 
     @Enumerated(EnumType.STRING)
-    Status taskStatus;
+    private Status taskStatus;
 
-    String taskSubject;
+    @Column(columnDefinition = "DATE")
+    private LocalDate assignedDate;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="assigned_employee_id")
-    User assignedEmployee;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_employee_id")
+    private User assignedEmployee;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="project_id")
-    Project project;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+
 }
