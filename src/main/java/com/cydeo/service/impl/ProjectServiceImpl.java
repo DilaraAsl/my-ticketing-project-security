@@ -1,12 +1,16 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.ProjectDTO;
+import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.Project;
+import com.cydeo.entity.User;
 import com.cydeo.enums.Status;
 import com.cydeo.mapper.ProjectMapper;
+import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.ProjectRepository;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
+import com.cydeo.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +23,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
-
     private final TaskService taskService;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper, TaskService taskService) {
+
+    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper, TaskService taskService, UserService userService, UserMapper userMapper) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
         this.taskService = taskService;
+        this.userService = userService;
+        this.userMapper = userMapper;
     }
 
 
@@ -94,5 +102,22 @@ public class ProjectServiceImpl implements ProjectService {
         // the tasks under this project their status should be marked as complete
 
         taskService.completeByProject(projectMapper.convertToDto(project));
+    }
+
+    @Override
+    public List<ProjectDTO> listAllProjectDetails() {
+
+        UserDTO currentUserDTO=userService.findByUserName("harold@manager.com");
+        User user=userMapper.convertToEntity(currentUserDTO);
+
+        List<Project> projectList=projectRepository.findAllByAssignedManager(user);
+        return projectList.stream().map(project -> {
+            ProjectDTO obj=projectMapper.convertToDto(project);
+            obj.setUnfinishedTaskCounts(taskService.totalNonCompletedTask(project.getProjectCode()));
+
+            obj.setCompleteTaskCounts(taskService.totalCompletedTask(project.getProjectCode()));
+            return obj;
+
+        }).collect(Collectors.toList());
     }
 }
