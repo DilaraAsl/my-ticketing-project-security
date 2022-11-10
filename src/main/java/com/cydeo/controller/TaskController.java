@@ -110,7 +110,7 @@ public class TaskController {
 
         model.addAttribute("task", taskService.findById(id));
         model.addAttribute("statuses", Status.values());
-        model.addAttribute("tasks", taskService.listAllTasksByStatus(Status.COMPLETE));
+        model.addAttribute("tasks", taskService.listAllTasksByStatusIsNot(Status.COMPLETE));
 
         return "/task/status-update";
 
