@@ -15,6 +15,7 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) { // Spring security package interface...
         // UserDetails user1=new User();// this is the spring user not my user class
