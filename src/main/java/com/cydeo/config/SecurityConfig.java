@@ -1,22 +1,21 @@
 package com.cydeo.config;
 
+import com.cydeo.service.SecurityService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfig {
+    private final SecurityService securityService;
+    private final AuthSuccessHandler authSuccessHandler;
+
+    public SecurityConfig(SecurityService securityService, AuthSuccessHandler authSuccessHandler) {
+        this.securityService = securityService;
+        this.authSuccessHandler = authSuccessHandler;
+    }
 // we are creating of beans from the springframework security package for authentication and authorization
 //    @Bean
 //    public UserDetailsService userDetailsService(PasswordEncoder encoder) { // Spring security package interface...
@@ -40,11 +39,12 @@ public class SecurityConfig {
 //                .antMatchers("/user/**").hasRole("ADMIN") // anything under the usercontroller- all pages will be accessible by admin.. // we don't need to place ROLE_ in the implementation it is auto added
 //                .antMatchers("/project/**").hasRole("MANAGER") // anything under the ProjectController- all pages will be accessible by manager..
 //                .antMatchers("/task/**").hasRole("MANAGER") // anything under the TaskController- all pages will be accessible by the manager..
-//                .antMatchers("/task/employee/**").hasRole("EMPLOYEE")
+//                .antMatchers("/task/employee/**").hasRole("EMPLOYEE") // we used this when we manually created our db
         // .antMatchers("/task/**").hasAnyRole("EMLOYEE","MANAGER") // String ... employee list
         // we are not using role because in the sql we entered
                 .antMatchers("/task/**").hasAuthority("Admin") // ROLE_  is defined in this format when we use has authority role definition should match the user entity defined roles
                 .antMatchers("/task/**").hasAuthority("Manager")
+                .antMatchers("/project/**").hasAuthority("Manager")
                 .antMatchers("/task/employee/**").hasAuthority("Employee")
 
 
@@ -61,9 +61,20 @@ public class SecurityConfig {
         // we are authenticating here through httpBasic--- whenever we open the app spring security is taking over httpBasic is a pop up..
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/welcome")
+          //      .defaultSuccessUrl("/welcome")
+                .successHandler(authSuccessHandler) // we are customizing the welcome page for each role
                 .failureUrl("/login?error=true")
                 .permitAll()// login and welcome pages should be accessible to all users
+                .and()
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // we need to provide the logout link
+                .logoutSuccessUrl("/login")
+
+                .and()
+                .rememberMe()
+                .tokenValiditySeconds(120)
+                .key("cydeo")
+                .userDetailsService(securityService) // user obj is coming from SecurityService
                 .and().build();
     }
 }
